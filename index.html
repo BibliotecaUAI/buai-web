@@ -506,7 +506,7 @@ select.sel{width:100%;margin-top:10px;border:1px solid var(--plata);border-radiu
   var av=pintarAvisos()[0];$('#capaAvisos').hidden=true;
   var real=false;
   try{
-   if('Notification' in window&&navigator.serviceWorker&&navigator.serviceWorker.controller){
+   if('Notification' in window&&navigator.serviceWorker&&location.protocol==='https:'){
     Notification.requestPermission().then(function(r){
      if(r==='granted'){navigator.serviceWorker.ready.then(function(reg){reg.showNotification(av[0],{body:av[1],icon:'icono-192.png',badge:'icono-192.png',tag:'buai-prueba'})});toast('Aviso enviado al teléfono. Si no lo ves, revisa la bandeja de notificaciones.')}
      else{banner(av[0],av[1]);toast('Los avisos están bloqueados en este teléfono. Se muestra una simulación.')}

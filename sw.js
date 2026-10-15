@@ -1,5 +1,5 @@
 // BUAI · trabajador en segundo plano: guarda la app para abrirla sin conexión y muestra avisos.
-const CACHE = 'buai-v1';
+const CACHE = 'buai-v2';
 const ARCHIVOS = ['./', './index.html', './manifest.webmanifest', './icono-192.png', './icono-512.png', './icono.svg'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(ARCHIVOS))); self.skipWaiting(); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(k => Promise.all(k.filter(n => n !== CACHE).map(n => caches.delete(n))))); self.clients.claim(); });
