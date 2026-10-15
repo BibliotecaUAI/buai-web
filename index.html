@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BUAI Web</title>
+<meta name="theme-color" content="#0B0B0C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BUAI">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icono.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icono-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap">
+<style>
+/* Diseño Perla negra (BUAI App): franja negra con brillo, vidrio esmerilado sobre fondo plata, lomos metalizados. Un solo aspecto claro, deliberado. */
+:root{
+ --negro:#111111;--plomo:#3F4247;--gris:#8A8D91;--plata:#BFC3C8;--linea:#DADCDF;--blanco:#FFFFFF;
+ --azul:#1B2A4A;--rojo:#E10600;--texto:#1C1C1E;--suave:#5E6166;
+ --fondo:linear-gradient(0deg,#C2C6CD 0%,#D9DCE1 38%,#F3F4F6 78%,#FFFFFF 100%);
+ --franja:linear-gradient(135deg,#3F4247 0%,#151516 42%,#0B0B0C 100%);
+ --letra:'Open Sans','Segoe UI',Arial,sans-serif;--serif:Georgia,'Times New Roman',serif;
+ color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{font-family:var(--letra);color:var(--texto);background:#D9DCE1;background-image:var(--fondo);display:flex;justify-content:center;align-items:center}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+button:focus-visible{outline:2px solid var(--negro);outline-offset:2px}
+
+.app{position:relative;width:100%;height:100%;overflow:hidden;background:var(--fondo)}
+@media (min-width:600px){.app{width:420px;height:min(880px,96vh);border-radius:44px;border:10px solid var(--negro);box-shadow:0 0 0 1px var(--plomo),0 30px 60px -20px rgba(0,0,0,.55)}}
+.app::before{content:"";position:absolute;inset:0;pointer-events:none;
+ background:radial-gradient(circle at 85% 42%,rgba(63,66,71,.30) 0,rgba(63,66,71,0) 26%),radial-gradient(circle at 10% 70%,rgba(17,17,17,.22) 0,rgba(17,17,17,0) 24%),radial-gradient(circle at 70% 88%,rgba(138,141,145,.35) 0,rgba(138,141,145,0) 22%),linear-gradient(115deg,rgba(255,255,255,0) 30%,rgba(255,255,255,.55) 46%,rgba(255,255,255,0) 62%)}
+.vista{position:absolute;inset:0;overflow-y:auto;padding-bottom:calc(100px + env(safe-area-inset-bottom,0px));-webkit-overflow-scrolling:touch}
+.pant[hidden]{display:none}
+
+@keyframes brillo{0%{background-position:120% 0}60%,100%{background-position:-120% 0}}
+@keyframes destello{0%,18%{top:-40%}42%,100%{top:120%}}
+@keyframes entra{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pant{animation:entra .25s ease-out}
+
+.franja{position:relative;overflow:hidden;background:var(--franja);color:var(--blanco);border-radius:0 0 28px 28px;padding:calc(18px + env(safe-area-inset-top,0px)) 18px 16px;z-index:1}
+.franja::after,.carnet::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,rgba(255,255,255,0) 38%,rgba(255,255,255,.10) 50%,rgba(255,255,255,0) 62%);background-size:250% 100%;animation:brillo 7s ease-in-out infinite;pointer-events:none}
+.franja>*{position:relative;z-index:1}
+
+.glass{position:relative;z-index:1;border-radius:22px;overflow:hidden;background:linear-gradient(160deg,rgba(255,255,255,.55),rgba(255,255,255,.28));-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);border:1px solid rgba(255,255,255,.75);box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(255,255,255,.35),0 18px 40px -22px rgba(40,44,52,.55)}
+.liquido{position:relative;z-index:2;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,.10));-webkit-backdrop-filter:blur(10px) saturate(190%) brightness(1.06);backdrop-filter:blur(10px) saturate(190%) brightness(1.06);border:1px solid rgba(255,255,255,.65);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.95),inset 0 -2px 3px rgba(255,255,255,.35),0 14px 30px -14px rgba(0,0,0,.45)}
+.liquido::before{content:"";position:absolute;left:6%;right:6%;top:0;height:45%;border-radius:0 0 50% 50%;background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0));pointer-events:none}
+.liquido>*{position:relative;z-index:1}
+
+.fila{display:flex;align-items:center;gap:10px}
+.av{width:46px;height:46px;border-radius:50%;background:linear-gradient(145deg,#F4F5F6,#BFC3C8 55%,#8A8D91);color:var(--negro);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none}
+.nom{font-size:15px;font-weight:800;line-height:1.2}.car{font-size:11px;color:var(--plata)}
+.logo{margin-left:auto;border:1.5px solid var(--plata);border-radius:9px;padding:6px 8px;font:700 13px var(--serif);letter-spacing:.5px}
+.anillos{display:flex;justify-content:space-between;margin-top:16px}
+.an{display:flex;align-items:center;gap:7px;width:33%;text-align:left}
+.an svg{flex:none}.an .n{font-size:18px;font-weight:800;line-height:1}.an .l{font-size:9px;color:var(--plata);line-height:1.25;letter-spacing:.3px}
+
+.buscar{margin:12px 14px 0;height:44px;border-radius:22px;display:flex;align-items:center;gap:8px;padding:0 16px;font-size:13px;color:var(--plomo);width:calc(100% - 28px);text-align:left}
+.card{margin:12px 14px 0;padding:14px}
+.card h2{margin:0;font-size:16px;font-weight:800}
+.ico-r{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+.punto{position:absolute;top:5px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--rojo);z-index:3}
+
+/* estantería */
+.estante{display:flex;gap:5px;align-items:flex-end;height:268px;margin-top:12px;position:relative;z-index:1}
+.abierto{position:relative;flex:1;max-width:170px;height:100%;border-radius:4px 9px 9px 4px;overflow:hidden;background:linear-gradient(0deg,rgba(255,255,255,.45),rgba(255,255,255,0) 22%),#D9DCE0;border:1px solid var(--plata);box-shadow:0 8px 18px -8px rgba(0,0,0,.45);padding:10px 9px 8px 15px;display:flex;flex-direction:column;text-align:left}
+.abierto::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(90deg,#9EA2A8,#F4F5F6 45%,#BFC3C8 70%,#8A8D91)}
+.rom-a{text-align:center;font:700 10px var(--serif);color:var(--plomo)}
+.doble{height:4px;border-top:1px solid var(--plomo);border-bottom:1px solid var(--plomo);opacity:.6;margin:5px 4px 8px}
+.abierto h3{margin:0;font-size:15px;line-height:1.12;font-weight:800}
+.abierto p{margin:5px 0 7px;font-size:9px;line-height:1.4;color:var(--plomo)}
+.mini{border-radius:8px;background:rgba(255,255,255,.55);padding:6px 6px 4px}
+.mini .tt{font-size:6.5px;letter-spacing:1px;font-weight:700;color:var(--plomo);text-align:center}
+.barras{display:flex;align-items:flex-end;justify-content:space-around;height:54px;padding-top:12px;border-bottom:1px solid var(--gris)}
+.barra{width:20px;border-radius:2px 2px 0 0;position:relative;background:linear-gradient(180deg,#3F4247,#111)}
+.barra b{position:absolute;top:-11px;left:-10px;right:-10px;text-align:center;font-size:8px}
+.ejes{display:flex;justify-content:space-around;font-size:7px;font-weight:600;color:var(--plomo);margin-top:2px}
+.entrar{margin-top:auto;height:26px;border-radius:13px;background:var(--negro);color:var(--blanco);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.vol{text-align:center;font:700 9px var(--serif);color:var(--plomo);margin-top:5px}
+.lomo{position:relative;width:40px;flex:none;height:100%;border-radius:9px 9px 6px 6px;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:8px 0;color:#ECEEF0;
+ background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,0) 14%,rgba(255,255,255,0) 86%,rgba(255,255,255,.08)),linear-gradient(90deg,rgba(44,45,48,.92) 0%,rgba(11,11,12,.9) 22%,rgba(58,60,64,.88) 50%,rgba(11,11,12,.9) 78%,rgba(30,31,34,.92) 100%);
+ border:1px solid var(--plomo);box-shadow:inset 1px 0 0 rgba(255,255,255,.18),0 8px 16px -8px rgba(0,0,0,.6)}
+.lomo::after{content:"";position:absolute;left:-30%;right:-30%;top:-40%;height:28%;background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.22),rgba(255,255,255,0));transform:skewY(-18deg);animation:destello 6s ease-in-out infinite}
+.lomo:nth-of-type(3)::after{animation-delay:.25s}.lomo:nth-of-type(4)::after{animation-delay:.5s}.lomo:nth-of-type(5)::after{animation-delay:.75s}
+.filete{width:70%;height:3px;border-top:1px solid var(--plata);border-bottom:1px solid var(--plata);opacity:.75;flex:none}
+.rom{font:14px var(--serif);height:16px;line-height:16px;margin:5px 0 0;background:linear-gradient(180deg,#FFF 0%,#BFC3C8 45%,#8A8D91 60%,#E9EBED 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lomo .ico{margin-top:10px;flex:none}
+.centro{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.titulo{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;font-size:8.5px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase}
+.cifra{font-size:13px;font-weight:800;color:var(--blanco);line-height:1;flex:none}
+.etq{font-size:5.6px;font-weight:700;letter-spacing:.3px;color:var(--plata);text-align:center;line-height:1.25;width:36px;height:14px;margin:3px 0 4px;display:flex;align-items:center;justify-content:center;flex:none}
+.lomo.on{outline:2px solid var(--plata);outline-offset:-3px}
+.repisa{height:7px;margin-top:4px;border-radius:4px;background:linear-gradient(180deg,#F4F5F6,#BFC3C8 60%,#8A8D91);box-shadow:0 4px 8px -3px rgba(0,0,0,.35);position:relative;z-index:1}
+
+/* barra inferior */
+.nav{position:absolute;left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));height:62px;border-radius:31px;display:flex;justify-content:space-around;align-items:center;padding:0 6px;z-index:5}
+.nav button{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--plomo);transition:background .2s}
+.nav button.on{background:linear-gradient(145deg,rgba(63,66,71,.92),rgba(11,11,12,.92));color:var(--blanco);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 12px -6px rgba(0,0,0,.6)}
+
+/* módulos */
+.cont{padding:0 14px;position:relative;z-index:1}
+.tf{display:flex;align-items:center;gap:10px}
+.vuelta{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;flex:none;color:var(--blanco)}
+.tf h2{margin:0;font-size:20px;font-weight:800;letter-spacing:-.3px}.tf .s{font-size:10.5px;color:var(--plata);letter-spacing:.6px}
+.kpis{display:flex;gap:8px;margin-top:14px}
+.kp{flex:1;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);padding:9px 10px;text-align:left;color:var(--blanco)}
+.kp .n{font-size:19px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}.kp .l{font-size:9px;color:var(--plata);margin-top:3px}
+.kp.on{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.4)}
+.item{margin-top:10px;padding:12px;display:flex;gap:11px}
+.item>*{position:relative;z-index:1}
+.tapa{width:44px;height:62px;border-radius:3px 6px 6px 3px;flex:none;position:relative;background:linear-gradient(135deg,#3F4247,#111);box-shadow:0 6px 12px -6px rgba(0,0,0,.6)}
+.tapa::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(90deg,#8A8D91,#E9EBED 50%,#8A8D91)}
+.tapa.pl{background:linear-gradient(135deg,#BFC3C8,#8A8D91)}
+.ti{font-size:13px;font-weight:800;line-height:1.25}.au{font-size:10.5px;color:var(--plomo);margin-top:2px}
+.meta{font-size:10px;color:var(--suave);margin-top:3px}
+.prog{height:5px;border-radius:3px;background:rgba(138,141,145,.35);margin-top:7px;overflow:hidden}.prog i{display:block;height:100%;background:linear-gradient(90deg,#3F4247,#111);transition:width .6s}
+.pie{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;flex-wrap:wrap}
+.chip{font-size:9.5px;font-weight:700;padding:3px 9px;border-radius:10px;background:rgba(255,255,255,.6);color:var(--plomo);white-space:nowrap}
+.chip.n{background:var(--negro);color:var(--blanco)}
+.btn{height:32px;padding:0 14px;border-radius:16px;background:var(--negro);color:var(--blanco);font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn.cl{background:rgba(255,255,255,.75);color:var(--negro);border:1px solid var(--plata)}.btn.off{background:rgba(218,220,223,.8);color:var(--gris);cursor:default}
+.btn.g{width:100%;height:44px;border-radius:22px;font-size:12.5px;margin-top:12px}
+.carnet{position:relative;overflow:hidden;margin:14px 14px 0;border-radius:20px;padding:16px;color:var(--blanco);z-index:1;width:calc(100% - 28px);text-align:left;display:block;
+ background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0) 30%),linear-gradient(90deg,#2C2D30,#0B0B0C 30%,#3A3C40 55%,#0B0B0C 80%,#1E1F22);border:1px solid var(--plomo);box-shadow:0 18px 34px -16px rgba(0,0,0,.7)}
+.carnet>*{position:relative;z-index:1}
+.cod{margin-top:12px;height:54px;border-radius:8px;background:var(--blanco);padding:6px 10px;display:flex;flex-direction:column;align-items:center}
+.cod div{width:100%;flex:1;background:repeating-linear-gradient(90deg,#111 0 2px,#fff 2px 3px,#111 3px 4px,#fff 4px 7px,#111 7px 10px,#fff 10px 11px,#111 11px 12px,#fff 12px 15px)}
+.cod span{font-size:9px;color:var(--negro);letter-spacing:2px;margin-top:2px}
+.lin{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(17,17,17,.07);font-size:12px}
+.lin:last-child{border-bottom:0}.lin b{font-size:13.5px;font-variant-numeric:tabular-nums}
+.pasos{display:flex;margin-top:14px}
+.paso{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
+.paso::before{content:"";position:absolute;top:13px;left:-50%;right:50%;height:2px;background:var(--negro)}
+.paso:first-child::before{display:none}.paso.no::before{background:rgba(138,141,145,.45)}
+.paso i{width:26px;height:26px;border-radius:50%;background:linear-gradient(145deg,#3F4247,#0B0B0C);color:var(--blanco);font:700 10px var(--letra);font-style:normal;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.paso.no i{background:var(--blanco);color:var(--gris);border:1.5px solid var(--plata)}
+.paso span{font-size:10px;font-weight:600;margin-top:5px}.paso.no span{color:var(--gris)}.paso.act span{font-weight:800}
+.listo{margin-top:12px;border-radius:12px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.8);padding:9px 11px;font-size:11px;line-height:1.45}
+.dispo{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px}
+.dispo th{background:var(--negro);color:var(--blanco);padding:6px 8px;text-align:left;font-size:10px}
+.dispo th:first-child{border-radius:8px 0 0 0}.dispo th:last-child{border-radius:0 8px 0 0}
+.dispo td{padding:6px 8px;border-bottom:1px solid rgba(138,141,145,.3);font-variant-numeric:tabular-nums}.dispo td:first-child{font-weight:700}
+.campo{display:flex;align-items:center;gap:8px;margin-top:12px;height:42px;border-radius:21px;background:rgba(255,255,255,.12);padding:0 14px}
+.campo input{flex:1;min-width:0;border:0;background:none;color:var(--blanco);font:14px var(--letra);outline:none}
+.campo input::placeholder{color:var(--plata)}
+.filtros{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.filtros button{font-size:10px;font-weight:700;padding:5px 10px;border-radius:12px;background:rgba(255,255,255,.12);color:var(--blanco)}
+.filtros button.on{background:var(--blanco);color:var(--negro)}
+select.sel{width:100%;margin-top:10px;border:1px solid var(--plata);border-radius:12px;padding:10px;font:11.5px var(--letra);background:rgba(255,255,255,.8);color:var(--texto)}
+.sala{margin-top:10px;padding:12px 14px}
+.sala>div{position:relative;z-index:1}
+.sala .hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sala .nm{font-size:13px;font-weight:800}.sala .hr{font-size:10px;color:var(--suave);white-space:nowrap}
+.ocu{height:12px;border-radius:6px;background:rgba(138,141,145,.35);margin-top:8px;overflow:hidden}.ocu i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#3F4247,#111)}
+.sala .px{display:flex;justify-content:space-between;font-size:10px;color:var(--plomo);margin-top:4px}
+.nota{font-size:11px;color:var(--plomo);line-height:1.5;margin:12px 4px 0}
+.vacio{text-align:center;font-size:12px;color:var(--suave);padding:22px 10px}
+
+/* aviso tipo notificación del teléfono */
+.notif{position:absolute;left:10px;right:10px;top:calc(10px + env(safe-area-inset-top,0px));z-index:20;border-radius:20px;padding:12px 14px;display:flex;gap:11px;align-items:flex-start;color:var(--negro);
+ background:rgba(245,246,247,.86);-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);box-shadow:0 18px 40px -14px rgba(0,0,0,.45);transform:translateY(-140%);transition:transform .45s cubic-bezier(.2,.9,.3,1.2)}
+.notif.ver{transform:none}
+.notif .ic{width:38px;height:38px;border-radius:9px;background:var(--franja);color:var(--blanco);font:700 10px var(--serif);display:flex;align-items:center;justify-content:center;flex:none;border:1px solid var(--plomo)}
+.notif .tx{flex:1;min-width:0;font-size:12px;line-height:1.35}.notif .tx b{font-size:12.5px}.notif .hr{font-size:10px;color:var(--suave);flex:none}
+.toast{position:absolute;left:24px;right:24px;bottom:calc(92px + env(safe-area-inset-bottom,0px));border-radius:16px;background:rgba(17,17,17,.92);color:var(--blanco);font-size:11.5px;padding:11px 14px;display:flex;align-items:center;gap:9px;box-shadow:0 14px 30px -12px rgba(0,0,0,.6);z-index:15;opacity:0;transform:translateY(10px);transition:.3s;pointer-events:none}
+.toast.ver{opacity:1;transform:none}
+
+/* hoja de avisos e instalación */
+.capa{position:absolute;inset:0;z-index:12;background:rgba(17,17,17,.35);display:flex;align-items:flex-end}
+.capa[hidden]{display:none}
+.hojab{width:100%;max-height:82%;overflow-y:auto;border-radius:26px 26px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,#FFFFFF,#E9EBEE)}
+.asa{width:40px;height:5px;border-radius:3px;background:var(--plata);margin:0 auto 12px}
+.hojab h3{margin:0 0 4px;font-size:17px;font-weight:800}
+.hojab .ds{font-size:11.5px;color:var(--plomo);line-height:1.5;margin:0 0 8px}
+.av-li{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--linea);font-size:12px;line-height:1.4}
+.av-li .bol{width:8px;height:8px;border-radius:50%;background:var(--negro);margin-top:5px;flex:none}
+.av-li small{display:block;color:var(--suave);font-size:10px}
+.pasos-i{margin:8px 0 0;padding-left:20px;font-size:12px;line-height:1.7}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs><linearGradient id="gPlata" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".5" stop-color="#BFC3C8"/><stop offset="1" stop-color="#8A8D91"/></linearGradient></defs>
+ <symbol id="i-casa" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H14v-6h-4v6H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+ <symbol id="i-libro" viewBox="0 0 24 24"><path d="M5 3.5h12a2 2 0 0 1 2 2v15H7a2 2 0 0 1-2-2zM5 18.5a2 2 0 0 1 2-2h12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+ <symbol id="i-reserva" viewBox="0 0 24 24"><path d="M7 3.5h10v17l-5-3.5-5 3.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+ <symbol id="i-lupa" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M15 15l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+ <symbol id="i-cuenta" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="11" r="2.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.8 16c.6-1.7 1.8-2.5 3.2-2.5s2.6.8 3.2 2.5M14.5 10h4M14.5 13.5h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></symbol>
+ <symbol id="i-sala" viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-4.5L19 8v13M9 21v-6h6v6M9 11h.01M15 11h.01" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+ <symbol id="i-campana" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+ <symbol id="i-bajar" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+ <symbol id="i-atras" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+ <symbol id="i-renovar" viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-2.1-5M19 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+ <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#1B2A4A"/><path d="M8 12.3l2.7 2.7L16 9.5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="app" id="app">
+ <div class="vista" id="vista">
+
+  <!-- INICIO -->
+  <section class="pant" id="p-inicio">
+   <div class="franja">
+    <div class="fila"><div class="av">CR</div><div><div class="nom">Camila Rojas</div><div class="car">Estudiante · Ingeniería Civil · ejemplo</div></div><div class="logo">BUAI</div></div>
+    <div class="anillos">
+     <button class="an" data-ir="prestamos"><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#3F4247" stroke-width="4"/><circle id="an1" cx="22" cy="22" r="18" fill="none" stroke="url(#gPlata)" stroke-width="4" stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="45" transform="rotate(-90 22 22)"/></svg><div><div class="n" id="k-act">3</div><div class="l">PRÉSTAMOS<br>ACTIVOS</div></div></button>
+     <button class="an" data-ir="prestamos"><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#3F4247" stroke-width="4"/><circle id="an2" cx="22" cy="22" r="18" fill="none" stroke="url(#gPlata)" stroke-width="4" stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="16" transform="rotate(-90 22 22)"/></svg><div><div class="n" id="k-dias">2</div><div class="l">DÍAS PARA<br>DEVOLVER</div></div></button>
+     <button class="an" data-ir="reservas"><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#3F4247" stroke-width="4"/><circle cx="22" cy="22" r="18" fill="none" stroke="url(#gPlata)" stroke-width="4" stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="56" transform="rotate(-90 22 22)"/></svg><div><div class="n" id="k-res">1</div><div class="l">RESERVA<br>LISTA</div></div></button>
+    </div>
+   </div>
+   <button class="buscar liquido" data-ir="buscar"><svg width="16" height="16"><use href="#i-lupa"/></svg><span>Buscar un libro, autor o tema</span></button>
+   <div class="card glass">
+    <div class="fila" style="position:relative;z-index:1"><h2>Mis servicios</h2>
+     <button class="ico-r liquido" style="margin-left:auto" id="b-instalar" aria-label="Instalar en este teléfono"><svg width="16" height="16" color="#111"><use href="#i-bajar"/></svg></button>
+     <button class="ico-r liquido" id="b-avisos" aria-label="Avisos"><svg width="16" height="16" color="#111"><use href="#i-campana"/></svg><span class="punto" id="punto"></span></button>
+    </div>
+    <div class="estante" id="estante">
+     <button class="abierto" id="libroAbierto" data-ir="cuenta">
+      <div class="rom-a" id="la-rom">I</div><div class="doble"></div>
+      <svg width="18" height="18" color="#111" style="margin-bottom:4px"><use id="la-ico" href="#i-cuenta"/></svg>
+      <h3 id="la-tit">Mi cuenta</h3>
+      <p id="la-txt">Carnet digital, estado de tu cuenta e historial de lectura.</p>
+      <div class="mini"><div class="tt" id="la-mt">PRÉSTAMOS PERMITIDOS</div>
+       <div class="barras" id="la-barras"></div>
+       <div class="ejes" id="la-ejes"></div></div>
+      <div class="entrar">Entrar →</div>
+      <div class="doble" style="margin:6px 4px 0"></div><div class="vol" id="la-vol">Vol. I</div>
+     </button>
+    </div>
+    <div class="repisa"></div>
+   </div>
+   <div class="card glass" style="padding:11px 14px">
+    <div class="fila" style="position:relative;z-index:1"><div class="tapa" style="width:30px;height:42px"></div><div style="min-width:0"><div class="meta" style="margin:0;font-weight:700;letter-spacing:.6px">PRÓXIMO VENCIMIENTO</div><div class="ti" id="pv-tit">—</div><div class="au" id="pv-txt">—</div></div><button class="btn" style="margin-left:auto" id="pv-btn"><svg width="13" height="13"><use href="#i-renovar"/></svg>Renovar</button></div>
+   </div>
+  </section>
+
+  <!-- I MI CUENTA -->
+  <section class="pant" id="p-cuenta" hidden>
+   <div class="franja"><div class="tf"><button class="vuelta" data-ir="inicio" aria-label="Volver"><svg width="16" height="16"><use href="#i-atras"/></svg></button><div><div class="s">I · MÓDULO</div><h2>Mi cuenta</h2></div></div></div>
+   <button class="carnet" id="carnet">
+    <div class="fila"><div class="av" style="width:40px;height:40px">CR</div><div><div class="nom">Camila Rojas</div><div class="car">Estudiante · ejemplo</div></div><div class="logo" style="font-size:11px">BUAI</div></div>
+    <div class="cod"><div></div><span>2000123456</span></div>
+    <div style="text-align:center;font-size:10px;color:var(--plata);margin-top:8px">Muestra este código en el mesón para prestar o retirar</div>
+   </button>
+   <div class="card glass" style="padding:4px 16px"><div style="position:relative;z-index:1">
+    <div class="lin"><span>Estado</span><span class="fila" style="gap:6px"><svg width="16" height="16"><use href="#i-check"/></svg><b>Al día</b></span></div>
+    <div class="lin"><span>Préstamos en uso</span><b id="c-uso">3 de 5</b></div>
+    <div class="lin"><span>Reservas en curso</span><b>2</b></div>
+    <div class="lin"><span>Libros leídos este año</span><b>14</b></div>
+   </div></div>
+   <div class="cont">
+    <button class="btn g cl" data-toast="El historial vendrá de Alma en la versión real.">Ver historial de préstamos</button>
+    <button class="btn g" style="margin-top:8px" data-toast="El certificado se descargará en PDF en la versión real.">Descargar certificado de no deuda</button>
+    <button class="btn g cl" style="margin-top:8px" id="b-instalar2"><svg width="14" height="14"><use href="#i-bajar"/></svg>Instalar en este teléfono</button>
+   </div>
+  </section>
+
+  <!-- II MIS PRÉSTAMOS -->
+  <section class="pant" id="p-prestamos" hidden>
+   <div class="franja">
+    <div class="tf"><button class="vuelta" data-ir="inicio" aria-label="Volver"><svg width="16" height="16"><use href="#i-atras"/></svg></button><div><div class="s">II · MÓDULO</div><h2>Mis préstamos</h2></div></div>
+    <div class="kpis"><button class="kp on" data-f="todos"><div class="n" id="p-k1">3</div><div class="l">Activos</div></button><button class="kp" data-f="pronto"><div class="n" id="p-k2">1</div><div class="l">Vencen en ≤ 3 días</div></button><button class="kp" data-f="atraso"><div class="n">0</div><div class="l">Atrasados</div></button></div>
+   </div>
+   <div class="cont"><div id="listaP"></div>
+    <button class="btn g" id="b-renTodos"><svg width="14" height="14"><use href="#i-renovar"/></svg>Renovar todos los que se puedan</button>
+   </div>
+  </section>
+
+  <!-- III MIS RESERVAS -->
+  <section class="pant" id="p-reservas" hidden>
+   <div class="franja">
+    <div class="tf"><button class="vuelta" data-ir="inicio" aria-label="Volver"><svg width="16" height="16"><use href="#i-atras"/></svg></button><div><div class="s">III · MÓDULO</div><h2>Mis reservas</h2></div></div>
+    <div class="kpis"><div class="kp"><div class="n" id="r-k1">0</div><div class="l">Pedida</div></div><div class="kp"><div class="n" id="r-k2">1</div><div class="l">En camino</div></div><div class="kp"><div class="n" id="r-k3">1</div><div class="l">Lista para retirar</div></div></div>
+   </div>
+   <div class="cont" id="listaR"></div>
+  </section>
+
+  <!-- IV BUSCAR -->
+  <section class="pant" id="p-buscar" hidden>
+   <div class="franja">
+    <div class="tf"><button class="vuelta" data-ir="inicio" aria-label="Volver"><svg width="16" height="16"><use href="#i-atras"/></svg></button><div><div class="s">IV · MÓDULO</div><h2>Buscar un libro</h2></div></div>
+    <label class="campo"><svg width="15" height="15" color="#BFC3C8"><use href="#i-lupa"/></svg><input id="q" type="search" placeholder="Título, autor o tema" value="cálculo" autocomplete="off"></label>
+    <div class="filtros" id="filtros"><button class="on" data-c="Libros">Libros</button><button data-c="Audiovisual">Audiovisual</button><button data-c="Equipos">Equipos</button><button data-c="disp">Disponible ahora</button></div>
+   </div>
+   <div class="cont" id="listaB"></div>
+  </section>
+
+  <!-- V SALAS -->
+  <section class="pant" id="p-salas" hidden>
+   <div class="franja">
+    <div class="tf"><button class="vuelta" data-ir="inicio" aria-label="Volver"><svg width="16" height="16"><use href="#i-atras"/></svg></button><div><div class="s">V · MÓDULO</div><h2>Salas y aforo</h2></div></div>
+    <div class="kpis"><div class="kp"><div class="n">58</div><div class="l">Puestos libres en total</div></div><div class="kp"><div class="n">14:00</div><div class="l">Último conteo</div></div></div>
+   </div>
+   <div class="cont" id="listaS"></div>
+   <p class="nota cont">Cifras de ejemplo. En la versión real vendrían del contador de personas que registra el equipo cada hora.</p>
+  </section>
+ </div>
+
+ <nav class="nav liquido" id="nav">
+  <button data-ir="inicio" class="on" aria-label="Inicio"><svg width="21" height="21"><use href="#i-casa"/></svg></button>
+  <button data-ir="cuenta" aria-label="Mi cuenta"><svg width="21" height="21"><use href="#i-cuenta"/></svg></button>
+  <button data-ir="prestamos" aria-label="Mis préstamos"><svg width="21" height="21"><use href="#i-libro"/></svg></button>
+  <button data-ir="reservas" aria-label="Mis reservas"><svg width="21" height="21"><use href="#i-reserva"/></svg></button>
+  <button data-ir="buscar" aria-label="Buscar"><svg width="21" height="21"><use href="#i-lupa"/></svg></button>
+  <button data-ir="salas" aria-label="Salas y aforo"><svg width="21" height="21"><use href="#i-sala"/></svg></button>
+ </nav>
+
+ <div class="notif" id="notif" role="status"><div class="ic">BUAI</div><div class="tx"><b id="n-tit">Bibliotecas UAI</b><br><span id="n-txt"></span></div><div class="hr">ahora</div></div>
+ <div class="toast" id="toast" role="status"><svg width="20" height="20" style="flex:none"><use href="#i-check"/></svg><div id="t-txt"></div></div>
+
+ <div class="capa" id="capaAvisos" hidden>
+  <div class="hojab" role="dialog" aria-label="Avisos">
+   <div class="asa"></div>
+   <h3>Avisos</h3>
+   <p class="ds">Así llegan los recordatorios. Con la app instalada, aparecen en el celular aunque esté cerrada.</p>
+   <div id="listaAv"></div>
+   <button class="btn g" id="b-probar"><svg width="14" height="14"><use href="#i-campana"/></svg>Probar un aviso ahora</button>
+   <button class="btn g cl" style="margin-top:8px" data-cerrar>Cerrar</button>
+  </div>
+ </div>
+
+ <div class="capa" id="capaInstalar" hidden>
+  <div class="hojab" role="dialog" aria-label="Instalar">
+   <div class="asa"></div>
+   <h3>Instalar BUAI en tu teléfono</h3>
+   <p class="ds">Queda con su ícono en la pantalla de inicio y se abre como una app, sin pasar por App Store ni Google Play.</p>
+   <b style="font-size:12.5px">iPhone (Safari)</b>
+   <ol class="pasos-i"><li>Toca el botón <b>Compartir</b> (cuadrado con flecha).</li><li>Elige <b>Agregar a inicio</b>.</li><li>Abre BUAI desde el ícono y acepta los avisos.</li></ol>
+   <b style="font-size:12.5px;display:block;margin-top:10px">Android (Chrome)</b>
+   <ol class="pasos-i"><li>Toca <b>Instalar</b> abajo, o el menú ⋮ → <b>Instalar app</b>.</li></ol>
+   <button class="btn g" id="b-instalarYa" hidden>Instalar</button>
+   <button class="btn g cl" data-cerrar>Entendido</button>
+  </div>
+ </div>
+</div>
+
+<script>
+(function(){
+ var $=function(s){return document.querySelector(s)}, $$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+ var DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+ var hoy=new Date();hoy.setHours(0,0,0,0);
+ // fechas de ejemplo siempre en día hábil (la biblioteca no atiende sábado ni domingo)
+ function mas(n){var d=new Date(hoy);d.setDate(d.getDate()+n);while(d.getDay()===0||d.getDay()===6)d.setDate(d.getDate()+1);return d}
+ function f(d){return ('0'+d.getDate()).slice(-2)+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+d.getFullYear()}
+ function fc(d){return DIAS[d.getDay()]+' '+('0'+d.getDate()).slice(-2)+'-'+('0'+(d.getMonth()+1)).slice(-2)}
+ function quedan(d){return Math.round((d-hoy)/864e5)}
+
+ // Datos de ejemplo (en la versión real vienen de Alma)
+ var P=[
+  {id:1,t:'Cálculo de una variable',a:'James Stewart · 8.ª ed.',b:'Biblioteca Pregrado Edif. A',v:mas(2),pl:0,ok:true},
+  {id:2,t:'Física universitaria, vol. 1',a:'Sears · Zemansky',b:'Biblioteca Edif. F',v:mas(6),pl:1,ok:false,por:'Reservado por otra persona'},
+  {id:3,t:'Ética a Nicómaco',a:'Aristóteles',b:'Biblioteca Postgrado (Errázuriz)',v:mas(12),pl:0,ok:true}
+ ];
+ var R=[
+  {id:1,t:'Introducción a la economía',a:'N. Gregory Mankiw',r:'Retiro en Biblioteca Viña del Mar',e:3,h:mas(3),pl:0},
+  {id:2,t:'Principios de economía',a:'N. Gregory Mankiw · 2019',r:'Retiro en Postgrado (Errázuriz) · On The Go',e:2,pl:1}
+ ];
+ var B=[
+  {t:'Cálculo de una variable: trascendentes tempranas',a:'James Stewart · Cengage · 2018 · 8.ª ed.',c:'Libros',cl:'515 STE · Libro impreso',d:[['Pregrado Edif. A',2,5,'7 días'],['Edif. F',0,2,'7 días'],['Postgrado (Errázuriz)',1,1,'14 días'],['Viña del Mar',0,1,'7 días']]},
+  {t:'Cálculo: varias variables',a:'James Stewart · 2021',c:'Libros',cl:'515 STE · Libro impreso',d:[['Pregrado Edif. A',3,4,'7 días'],['Viña del Mar',0,1,'7 días']]},
+  {t:'Cálculo diferencial e integral (curso en video)',a:'DVD · 2015',c:'Audiovisual',cl:'DVD 515 CAL',d:[['Pregrado Edif. A',1,1,'3 días']]},
+  {t:'Calculadora gráfica TI-84 Plus',a:'Equipo · préstamo en sala',c:'Equipos',cl:'Equipos y tecnología',d:[['Pregrado Edif. A',4,10,'1 día'],['Edif. F',0,4,'1 día']]}
+ ];
+ var S=[['Pregrado Edif. A · Peñalolén','21:00',94,120],['Edif. F · Peñalolén','20:00',33,60],['Postgrado · Errázuriz','19:00',36,40],['Viña del Mar','20:00',49,50]];
+ var MOD={
+  cuenta:{rom:'I',ico:'#i-cuenta',tit:'Mi cuenta',txt:'Carnet digital, estado de tu cuenta e historial de lectura.',mt:'PRÉSTAMOS PERMITIDOS',barras:[['En uso',3],['Disponibles',2]],et:'',cifra:''},
+  prestamos:{rom:'II',ico:'#i-libro',tit:'Mis préstamos',txt:'Qué tienes, cuándo vence y renueva con un toque.',mt:'DÍAS QUE QUEDAN',et:'ACTIVOS'},
+  reservas:{rom:'III',ico:'#i-reserva',tit:'Mis reservas',txt:'Sigue tu reserva: pedida, en camino y lista.',mt:'RESERVAS POR ETAPA',et:'LISTA'},
+  buscar:{rom:'IV',ico:'#i-lupa',tit:'Buscar un libro',txt:'Busca en el catálogo, ve copias por biblioteca y reserva.',mt:'COPIAS DISPONIBLES',barras:[['Edif. A',2],['Errázuriz',1],['Viña',0]],et:'CATÁLOGO'},
+  salas:{rom:'V',ico:'#i-sala',tit:'Salas y aforo',txt:'Puestos libres en cada biblioteca y su horario.',mt:'PUESTOS LIBRES',barras:S.map(function(s,i){return [['Edif. A','Edif. F','Errázuriz','Viña'][i],s[3]-s[2]]}),et:'PUESTOS LIBRES'}
+ };
+ var abierto='cuenta';
+
+ function barrasMod(k){
+  if(k==='prestamos')return P.map(function(p,i){return ['L'+(i+1),quedan(p.v)]});
+  if(k==='reservas')return [['Pedida',R.filter(function(r){return r.e===1}).length],['Camino',R.filter(function(r){return r.e===2}).length],['Lista',R.filter(function(r){return r.e===3}).length]];
+  return MOD[k].barras;
+ }
+ function cifraMod(k){
+  if(k==='prestamos')return P.length;
+  if(k==='reservas')return R.filter(function(r){return r.e===3}).length;
+  if(k==='buscar')return '—';
+  if(k==='salas')return S.reduce(function(a,s){return a+s[3]-s[2]},0);
+  return '';
+ }
+ function pintarEstante(){
+  var m=MOD[abierto],e=$('#estante');
+  $('#la-rom').textContent=m.rom;$('#la-vol').textContent='Vol. '+m.rom;$('#la-ico').setAttribute('href',m.ico);
+  $('#la-tit').textContent=m.tit;$('#la-txt').textContent=m.txt;$('#la-mt').textContent=m.mt;
+  $('#libroAbierto').setAttribute('data-ir',abierto);
+  var b=barrasMod(abierto),mx=Math.max.apply(null,b.map(function(x){return x[1]}).concat([1]));
+  $('#la-barras').innerHTML=b.map(function(x){return '<div class="barra" style="height:'+Math.max(4,x[1]/mx*100)+'%"><b>'+x[1]+'</b></div>'}).join('');
+  $('#la-ejes').innerHTML=b.map(function(x){return '<span>'+x[0]+'</span>'}).join('');
+  $$('.lomo').forEach(function(l){l.remove()});
+  Object.keys(MOD).forEach(function(k){
+   if(k===abierto)return;var m2=MOD[k];
+   var l=document.createElement('button');l.className='lomo';l.setAttribute('aria-label','Abrir '+m2.tit+' en la estantería');
+   l.innerHTML='<div class="filete"></div><div class="rom">'+m2.rom+'</div><svg class="ico" width="15" height="15" color="#D7DADE"><use href="'+m2.ico+'"/></svg><div class="centro"><div class="titulo">'+m2.tit.replace('Mis ','').replace('Buscar un libro','Buscar')+'</div></div><div class="cifra">'+(cifraMod(k)===''?'·':cifraMod(k))+'</div><div class="etq">'+(m2.et||'CUENTA')+'</div><div class="filete"></div>';
+   l.onclick=function(){abierto=k;pintarEstante()};
+   e.appendChild(l);
+  });
+ }
+
+ function pintarInicio(){
+  var orden=P.slice().sort(function(a,b){return a.v-b.v}),p=orden[0];
+  $('#k-act').textContent=P.length;$('#k-dias').textContent=quedan(p.v);
+  $('#an2').setAttribute('stroke-dashoffset',Math.min(113,Math.round(113*quedan(p.v)/14)));
+  $('#k-res').textContent=R.filter(function(r){return r.e===3}).length;
+  $('#pv-tit').textContent=p.t;
+  $('#pv-txt').textContent='Vence el '+fc(p.v)+' · quedan '+quedan(p.v)+' días';
+  $('#pv-btn').onclick=function(){renovar(p.id)};
+  pintarEstante();
+ }
+
+ var filtroP='todos';
+ function pintarPrestamos(){
+  var lista=P.slice().sort(function(a,b){return a.v-b.v}).filter(function(p){return filtroP==='todos'||(filtroP==='pronto'&&quedan(p.v)<=3)||(filtroP==='atraso'&&quedan(p.v)<0)});
+  $('#p-k1').textContent=P.length;$('#p-k2').textContent=P.filter(function(p){return quedan(p.v)<=3}).length;
+  $('#listaP').innerHTML=lista.length?lista.map(function(p){
+   var q=quedan(p.v),pct=Math.max(4,Math.min(100,100-q/14*100));
+   var acc=p.ok?'<button class="btn" data-ren="'+p.id+'"><svg width="12" height="12"><use href="#i-renovar"/></svg>Renovar</button>':'<span class="btn off">'+p.por+'</span>';
+   return '<div class="item glass"><div class="tapa'+(p.pl?' pl':'')+'"></div><div style="flex:1;min-width:0"><div class="ti">'+p.t+'</div><div class="au">'+p.a+'</div><div class="meta">'+p.b+' · vence '+f(p.v)+(p.ren?' · renovado':'')+'</div><div class="prog"><i style="width:'+pct+'%"></i></div><div class="pie"><span class="chip'+(q<=3?' n':'')+'">Quedan '+q+' días</span>'+acc+'</div></div></div>';
+  }).join(''):'<div class="vacio">No tienes préstamos en este grupo.</div>';
+  $$('[data-ren]').forEach(function(b){b.onclick=function(){renovar(+b.getAttribute('data-ren'))}});
+ }
+ function renovar(id,silencio){
+  var p=P.filter(function(x){return x.id===id})[0];if(!p||!p.ok)return false;
+  p.v=new Date(Math.max(p.v,hoy));p.v.setDate(p.v.getDate()+7);while(p.v.getDay()===0||p.v.getDay()===6)p.v.setDate(p.v.getDate()+1);p.ren=true;
+  if(!silencio)toast('<b>Renovado</b> · '+p.t+' hasta el '+f(p.v));
+  pintarTodo();return true;
+ }
+ $('#b-renTodos').onclick=function(){var n=0;P.forEach(function(p){if(renovar(p.id,true))n++});toast(n?'<b>'+n+' libros renovados</b> · 1 no se pudo: otra persona lo reservó':'No hay libros que se puedan renovar')};
+ $$('[data-f]').forEach(function(b){b.onclick=function(){filtroP=b.getAttribute('data-f');$$('[data-f]').forEach(function(x){x.classList.toggle('on',x===b)});pintarPrestamos()}});
+
+ function pintarReservas(){
+  $('#r-k1').textContent=R.filter(function(r){return r.e===1}).length;$('#r-k2').textContent=R.filter(function(r){return r.e===2}).length;$('#r-k3').textContent=R.filter(function(r){return r.e===3}).length;
+  $('#listaR').innerHTML=R.length?R.map(function(r){
+   var et=['Pedida','En camino','Lista para retirar'].map(function(n,i){var c=i+1<r.e?'':i+1===r.e?' act':' no';return '<div class="paso'+c+'"><i>'+(i+1)+'</i><span>'+n+'</span></div>'}).join('');
+   return '<div class="item glass" style="display:block;padding:14px"><div class="fila" style="align-items:flex-start"><div class="tapa'+(r.pl?' pl':'')+'"></div><div><div class="ti">'+r.t+'</div><div class="au">'+r.a+'</div><div class="meta">'+r.r+'</div></div></div><div class="pasos">'+et+'</div>'+(r.e===3?'<div class="listo">Puedes retirarlo hasta el '+fc(r.h)+'. Muestra tu carnet digital en el mesón.</div>':'')+'<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">'+(r.e===3?'<button class="btn" data-ir="cuenta">Ver carnet</button>':'')+'<button class="btn cl" data-can="'+r.id+'">Cancelar reserva</button></div></div>';
+  }).join(''):'<div class="vacio">No tienes reservas en curso. Busca un libro para reservarlo.</div>';
+  $$('[data-can]').forEach(function(b){b.onclick=function(){var id=+b.getAttribute('data-can');R=R.filter(function(r){return r.id!==id});toast('Reserva cancelada');pintarTodo()}});
+  enlazarIr();
+ }
+
+ var filtroB='Libros';
+ function pintarBuscar(){
+  var q=($('#q').value||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  var lista=B.filter(function(x){
+   var txt=(x.t+' '+x.a).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+   var tot=x.d.reduce(function(a,d){return a+d[1]},0);
+   return txt.indexOf(q)>=0&&(filtroB==='disp'?tot>0:x.c===filtroB);
+  });
+  $('#listaB').innerHTML=lista.length?lista.map(function(x,i){
+   var tot=x.d.reduce(function(a,d){return a+d[1]},0);
+   if(i>0)return '<div class="item glass" style="padding:10px 12px;align-items:center"><div class="tapa pl" style="width:30px;height:42px"></div><div style="min-width:0"><div class="ti" style="font-size:12px">'+x.t+'</div><div class="au">'+x.a+'</div></div><span class="chip n" style="margin-left:auto">'+tot+' disponibles</span></div>';
+   return '<div class="item glass" style="display:block"><div class="fila" style="align-items:flex-start"><div class="tapa" style="width:56px;height:80px"></div><div style="min-width:0"><div class="ti" style="font-size:14px">'+x.t+'</div><div class="au">'+x.a+'</div><div class="meta">'+x.cl+'</div></div></div>'+
+    '<table class="dispo"><tr><th>Biblioteca</th><th>Disponibles</th><th>Préstamo</th></tr>'+x.d.map(function(d){return '<tr><td>'+d[0]+'</td><td>'+d[1]+' de '+d[2]+'</td><td>'+d[3]+'</td></tr>'}).join('')+'</table>'+
+    '<label for="retiro" style="position:absolute;left:-9999px">Retirar en</label><select class="sel" id="retiro"><option>Retirar en Pregrado Edif. A · disponible hoy</option><option>Retirar en Biblioteca Viña del Mar · On The Go, 2 a 3 días</option><option>Retirar en Postgrado (Errázuriz) · disponible hoy</option><option>Retirar en Edif. F · On The Go, 1 a 2 días</option></select>'+
+    '<button class="btn g" id="b-reservar"><svg width="14" height="14"><use href="#i-reserva"/></svg>Reservar</button></div>';
+  }).join(''):'<div class="vacio">No encontramos resultados. Prueba con otra palabra.</div>';
+  var br=$('#b-reservar');if(br)br.onclick=function(){
+   var x=lista[0],donde=$('#retiro').value.split(' · ')[0].replace('Retirar en ','');
+   R.push({id:Date.now(),t:x.t,a:x.a,r:'Retiro en '+donde,e:1,pl:0});toast('<b>Reserva creada</b> · la verás en Mis reservas');pintarTodo();
+  };
+ }
+ $('#q').addEventListener('input',pintarBuscar);
+ $$('#filtros button').forEach(function(b){b.onclick=function(){filtroB=b.getAttribute('data-c');$$('#filtros button').forEach(function(x){x.classList.toggle('on',x===b)});pintarBuscar()}});
+
+ function pintarSalas(){
+  $('#listaS').innerHTML=S.map(function(s){var l=s[3]-s[2];return '<div class="sala glass"><div><div class="hd"><span class="nm">'+s[0]+'</span><span class="hr">Abierta hasta '+s[1]+'</span></div><div class="ocu"><i style="width:'+Math.round(s[2]/s[3]*100)+'%"></i></div><div class="px"><span>'+s[2]+' de '+s[3]+' puestos ocupados</span><b>'+l+(l===1?' libre':' libres')+'</b></div>'+(l<5?'<div style="text-align:right;margin-top:8px"><button class="btn cl" data-avisame="'+s[0]+'"><svg width="12" height="12"><use href="#i-campana"/></svg>Avisarme cuando haya puestos</button></div>':'')+'</div></div>'}).join('');
+  $$('[data-avisame]').forEach(function(b){b.onclick=function(){toast('Te avisaremos cuando haya puestos en '+b.getAttribute('data-avisame').split(' ·')[0])}});
+ }
+
+ function pintarAvisos(){
+  var p=P.slice().sort(function(a,b){return a.v-b.v})[0],r=R.filter(function(x){return x.e===3})[0];
+  var av=[];
+  if(p)av.push(['Tu libro vence pronto',p.t+' vence el '+fc(p.v)+'. Puedes renovarlo desde la app.','hoy 09:00']);
+  if(r)av.push(['Tu reserva está lista',r.t+': retírala hasta el '+fc(r.h)+'.','ayer 16:20']);
+  av.push(['Reserva en camino','Principios de economía viaja por On The Go a Errázuriz.','lunes 11:05']);
+  $('#listaAv').innerHTML=av.map(function(a){return '<div class="av-li"><span class="bol"></span><div><b>'+a[0]+'</b><br>'+a[1]+'<small>'+a[2]+'</small></div></div>'}).join('');
+  return av;
+ }
+
+ function pintarTodo(){pintarInicio();pintarPrestamos();pintarReservas();pintarBuscar();pintarSalas();$('#c-uso').textContent=P.length+' de 5'}
+
+ // Navegación
+ function ir(k){
+  $$('.pant').forEach(function(s){s.hidden=s.id!=='p-'+k});
+  $$('#nav button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-ir')===k)});
+  $('#vista').scrollTop=0;
+  try{history.replaceState(null,'','#'+k)}catch(e){}
+ }
+ function enlazarIr(){$$('[data-ir]').forEach(function(b){b.onclick=function(){ir(b.getAttribute('data-ir'))}})}
+
+ // Avisos
+ var tt;function toast(h){$('#t-txt').innerHTML=h;$('#toast').classList.add('ver');clearTimeout(tt);tt=setTimeout(function(){$('#toast').classList.remove('ver')},2800)}
+ var tn;function banner(t,x){$('#n-tit').textContent=t;$('#n-txt').textContent=x;$('#notif').classList.add('ver');clearTimeout(tn);tn=setTimeout(function(){$('#notif').classList.remove('ver')},5000)}
+ $('#notif').onclick=function(){$('#notif').classList.remove('ver');ir('prestamos')};
+ function abrir(id){$(id).hidden=false}
+ $$('.capa').forEach(function(c){c.onclick=function(e){if(e.target===c||e.target.hasAttribute('data-cerrar'))c.hidden=true}});
+ $('#b-avisos').onclick=function(){pintarAvisos();$('#punto').hidden=true;abrir('#capaAvisos')};
+ $('#b-probar').onclick=function(){
+  var av=pintarAvisos()[0];$('#capaAvisos').hidden=true;
+  var real=false;
+  try{
+   if('Notification' in window&&navigator.serviceWorker&&navigator.serviceWorker.controller){
+    Notification.requestPermission().then(function(r){
+     if(r==='granted'){navigator.serviceWorker.ready.then(function(reg){reg.showNotification(av[0],{body:av[1],icon:'icono-192.png',badge:'icono-192.png',tag:'buai-prueba'})});toast('Aviso enviado al teléfono. Si no lo ves, revisa la bandeja de notificaciones.')}
+     else{banner(av[0],av[1]);toast('Los avisos están bloqueados en este teléfono. Se muestra una simulación.')}
+    });real=true;
+   }
+  }catch(e){}
+  if(!real){setTimeout(function(){banner(av[0],av[1])},400)}
+ };
+ $$('[data-toast]').forEach(function(b){b.onclick=function(){toast(b.getAttribute('data-toast'))}});
+ $('#carnet').onclick=function(){toast('En la versión real, la pantalla sube el brillo para leer el código')};
+
+ // Instalación (PWA)
+ var diferido=null;
+ window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();diferido=e;$('#b-instalarYa').hidden=false});
+ function verInstalar(){
+  var instalada=window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+  if(instalada){toast('BUAI ya está instalada en este teléfono');return}
+  abrir('#capaInstalar');
+ }
+ $('#b-instalar').onclick=verInstalar;$('#b-instalar2').onclick=verInstalar;
+ $('#b-instalarYa').onclick=function(){if(diferido){diferido.prompt();diferido=null;$('#capaInstalar').hidden=true}};
+ if('serviceWorker' in navigator&&location.protocol==='https:'){try{navigator.serviceWorker.register('sw.js').catch(function(){})}catch(e){}}
+
+ enlazarIr();pintarTodo();
+ var h=(location.hash||'').slice(1);if(['inicio','cuenta','prestamos','reservas','buscar','salas'].indexOf(h)>=0)ir(h);
+ setTimeout(function(){banner('Tu libro vence pronto',P[0].t+' vence el '+fc(P[0].v)+'. Toca para renovarlo.')},1600);
+})();
+</script>
+</body>
+</html>
